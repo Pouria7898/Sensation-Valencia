@@ -31,27 +31,60 @@
             margin: 0;
         }
 
-        .pdf-container {
+        .pdf-viewer {
             width: 100%;
             height: 100vh;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
             border: none;
+        }
+        
+        /* Add PDF.js viewer styling */
+        #viewer {
+            width: 100%;
+            height: calc(100vh - 80px);
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="restaurant-name">Your Restaurant Name</h1>
+        <h1 class="restaurant-name">Sensation valencia</h1>
     </div>
-    <div class="pdf-container">
-        <iframe 
-            src="menu.pdf#toolbar=0" 
-            title="Sensation Valencia"
-        ></iframe>
-    </div>
+    
+    <!-- PDF.js Viewer Container -->
+    <div id="viewer"></div>
+
+    <!-- Add PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    
+    <script>
+        // Configure PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        // Load and display PDF
+        const loadingTask = pdfjsLib.getDocument("menu.pdf");
+        loadingTask.promise.then(pdf => {
+            // Get first page
+            pdf.getPage(1).then(page => {
+                const scale = 1.5;
+                const viewport = page.getViewport({ scale });
+
+                // Prepare canvas
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                page.render(renderContext).promise.then(() => {
+                    document.getElementById('viewer').appendChild(canvas);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
