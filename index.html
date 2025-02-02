@@ -12,56 +12,51 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f5f0;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
         }
 
         .header {
-            text-align: center;
-            padding: 20px 0;
-            background-color: #5c3d2e;
+            background: #333;
             color: white;
+            padding: 20px;
+            text-align: center;
         }
 
-        .restaurant-name {
-            font-family: 'Georgia', serif;
-            font-size: 2.5em;
-            letter-spacing: 2px;
-            margin: 0;
+        #pdf-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        .pdf-viewer {
+        #pdf-viewer {
             width: 100%;
             height: 100vh;
-            border: none;
-        }
-        
-        /* Add PDF.js viewer styling */
-        #viewer {
-            width: 100%;
-            height: calc(100vh - 80px);
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="restaurant-name">Sensation valencia</h1>
+        <h1>Sensation Valencia</h1>
     </div>
     
-    <!-- PDF.js Viewer Container -->
-    <div id="viewer"></div>
+    <div id="pdf-container">
+        <canvas id="pdf-viewer"></canvas>
+    </div>
 
-    <!-- Add PDF.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
     <script>
         // Configure PDF.js
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // Load and display PDF
+        // Load PDF
         const loadingTask = pdfjsLib.getDocument("menu.pdf");
+        
         loadingTask.promise.then(pdf => {
             // Get first page
             pdf.getPage(1).then(page => {
@@ -69,7 +64,7 @@
                 const viewport = page.getViewport({ scale });
 
                 // Prepare canvas
-                const canvas = document.createElement('canvas');
+                const canvas = document.getElementById('pdf-viewer');
                 const context = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
@@ -80,10 +75,10 @@
                     viewport: viewport
                 };
                 
-                page.render(renderContext).promise.then(() => {
-                    document.getElementById('viewer').appendChild(canvas);
-                });
+                page.render(renderContext);
             });
+        }).catch(error => {
+            console.error('Error loading PDF:', error);
         });
     </script>
 </body>
