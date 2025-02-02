@@ -1,0 +1,8 @@
+plugins:
+  - jekyll-redirect-from
+
+markdown: kramdown
+theme: minima
+
+include:
+  - .nojekyll
